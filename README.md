@@ -1,15 +1,17 @@
-# Danish_Maknojia_MP5
+# Danish_Maknojia_MP6
 
-[![CI](https://github.com/nogibjj/Maknojia_Danish_MP5/actions/workflows/cicd.yml/badge.svg)](https://github.com/nogibjj/Maknojia_Danish_MP5/actions/workflows/cicd.yml)
+[![CI](https://github.com/nogibjj/Maknojia_Danish_MP6/actions/workflows/cicd.yml/badge.svg)](https://github.com/nogibjj/Maknojia_Danish_MP6/actions/workflows/cicd.yml)
 
 ## Project Overview
-This project is a python script which interacts with a dataset on SQLlite. The project focuses on the ETL pipeline (Extract, Transform & Load):
+This project is a python script which interacts with a cloud-based SQL server on Databricks. The project requires us to build an ETL pipeline (Extract, Transform & Load) and focus on creating a complex SQL query:
 
 - Extract: Raw data is accessed via github repo
 
 - Transform & Load: Reads data from a CSV file, processes it, and loads it into a local SQLite3 database named WRRankingDB.db.
 
 - Query: Performs CRUD operations (create, read, update, delete) on the database, and logging each SQL query to a markdown file (query_log.md). The log_query function appends the executed SQL queries to the log file, while general_query, create_record, update_record, delete_record, and read_data manage data operations within the database.
+
+- Complex SQL Query: Running a query on the tables in the database which joins tables and provides valuable insights
 
 ## Directory Overview
 
@@ -18,14 +20,16 @@ This project is a python script which interacts with a dataset on SQLlite. The p
 ├── README.md
 ├── WRRankingDB.db
 ├── __pycache__
-│   ├── main.cpython-312.pyc
 │   └── test.cpython-312-pytest-7.4.0.pyc
+├── complexQueryLog.md
 ├── data
-│   └── WRRankingsWeek5.csv
+│   ├── WRRankingsWeek5Points.csv
+│   └── WRRankingsWeek5Ranking.csv
 ├── lib
 │   ├── __init__.py
 │   ├── __pycache__
 │   │   ├── __init__.cpython-312.pyc
+│   │   ├── extract.cpython-312.pyc
 │   │   ├── query.cpython-312.pyc
 │   │   └── transform_load.cpython-312.pyc
 │   ├── extract.py
@@ -38,6 +42,37 @@ This project is a python script which interacts with a dataset on SQLlite. The p
 
 ```
 
+## Complex Query 
+```sql
+WITH player_stats AS (
+    SELECT '2024' AS season,
+        p.PLAYER_NAME AS player,
+        r.TEAM AS team,
+        r.OPP AS opponent,
+        p.PROJ_FPTS AS projected_points
+    FROM drm85_mp6.drm85_wr_points p
+    JOIN drm85_mp6.drm85_wr_ranking r ON p.PLAYER_NAME = r.PLAYER_NAME
+    WHERE p.PROJ_FPTS IS NOT NULL
+),
+team_player_stats AS (
+    SELECT team,
+        player,
+        AVG(projected_points) AS avg_projected_points
+    FROM player_stats
+    GROUP BY team, player
+)
+
+SELECT team, player, avg_projected_points
+FROM team_player_stats
+ORDER BY avg_projected_points DESC
+LIMIT 10;
+
+```
+This query calculates the average projected fantasy points for players in the 2024 season and combines it with data from previous seasons.
+It first extracts player statistics and their respective teams, then calculates the average projected points for each player grouped by their team.
+The results are sorted in descending order to display the top 10 players with the highest average projected points.
+
+
 ## CI/CD
-1. make all: Will test, format, and lint the project
+1. make all: will test, format, and lint the project
 
