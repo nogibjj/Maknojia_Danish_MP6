@@ -73,21 +73,23 @@ def test_query():
         LIMIT 10;
     """
 
-    result = subprocess.run(
-        ["python3", "main.py", "query", query_string], capture_output=True, text=True
-    )
+    try:
+        result = subprocess.run(
+            ["python3", "main.py", "query", query_string],
+            capture_output=True,
+            text=True,
+            check=True,  # Raise an error if the command fails
+        )
 
-    # Check if the command was successful
-    if result.returncode != 0:
-        print(f"Query failed with return code {result.returncode}")
-        print("STDOUT:", result.stdout)
-        print("STDERR:", result.stderr)
-        return
+        # Check for expected output in the result
+        assert "team" in result.stdout, "Expected 'team' in the query result"
+        assert "player" in result.stdout, "Expected 'player' in the query result"
+        print("Query Test Passed!")
 
-    # Check for expected output in the result
-    assert "team" in result.stdout, "Expected 'team' in the query result"
-    assert "player" in result.stdout, "Expected 'player' in the query result"
-    print("Query Test Passed!")
+    except subprocess.CalledProcessError as e:
+        print(f"Query failed with return code {e.returncode}")
+        print("STDOUT:", e.stdout)
+        print("STDERR:", e.stderr)
 
 
 if __name__ == "__main__":
