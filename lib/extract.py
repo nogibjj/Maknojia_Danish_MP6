@@ -5,21 +5,16 @@ Extract a dataset from a URL the Week 5 Fantasy Football PPR WR
 import os
 import requests
 import pandas as pd
-
-
-import os
-import requests
-import pandas as pd
 from io import StringIO
 
 
 def extract(
-    url="https://github.com/nogibjj/Maknojia_Danish_MP6/raw/refs/heads/main/data/WRRankingsWeek5Points.csv",
-    url2="https://github.com/nogibjj/Maknojia_Danish_MP6/raw/refs/heads/main/data/WRRankingsWeek5Ranking.csv",
+    url="https://raw.githubusercontent.com/danishmaknojia/data/refs/heads/main/WRRankingsWeek5Points.csv",
+    url2="https://github.com/danishmaknojia/data/raw/refs/heads/main/WRRankingsWeek5Ranking.csv",
     file_path1="data/WRRankingsWeek5Points.csv",
     file_path2="data/WRRankingsWeek5Ranking.csv",
     directory="data",
-    n=100,
+    n=12,
 ):
     """Extracts URLs to their respective file paths with only the first n rows."""
     if not os.path.exists(directory):

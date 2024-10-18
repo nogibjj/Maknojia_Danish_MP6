@@ -5,14 +5,14 @@ from dotenv import load_dotenv
 
 
 # Transforms and Loads WR rankings and points data into the specified Databricks database
-def loadData(
+def load(
     points_dataset="data/WRRankingsWeek5Points.csv",
     ranking_dataset="data/WRRankingsWeek5Ranking.csv",
 ):
 
-    database_name = "nd191_assignment6"
-    points_table = "nd191_wr_points"
-    ranking_table = "nd191_wr_ranking"
+    database_name = "drm85_MP6"
+    points_table = "drm85_wr_points"
+    ranking_table = "drm85_wr_ranking"
 
     # Load datasets
     df_points = pd.read_csv(points_dataset)
@@ -100,4 +100,4 @@ def loadData(
     return "Data loaded successfully"
 
 
-loadData()
+load()

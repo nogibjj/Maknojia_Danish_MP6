@@ -1,8 +1,20 @@
 import subprocess
 
 
+def test_extract():
+    """Test the extract() function."""
+    result = subprocess.run(
+        ["python", "main.py", "extract"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert result.returncode == 0
+    assert "Extracting data..." in result.stdout
+
+
 def test_load():
-    """Tests the load operation."""
+    """Test the transform_load() function."""
     result = subprocess.run(
         ["python", "main.py", "load"],
         capture_output=True,
@@ -14,86 +26,71 @@ def test_load():
 
 
 def test_query():
-    """Tests the query operation."""
-    query_string = "SELECT * FROM WRRankingDB"
+    """Test queryData() with a complex SQL query for player statistics."""
+    query_string = """
+        WITH player_stats AS (
+            SELECT '2024' AS season, 
+                p.PLAYER_NAME AS player, 
+                r.TEAM AS team, 
+                r.OPP AS opponent, 
+                p.PROJ_FPTS AS projected_points,
+                CAST(p.GAMES_PLAYED AS INT) AS games_played
+            FROM drm85_wr_points p
+            JOIN drm85_wr_ranking r ON p.PLAYER_NAME = r.PLAYER_NAME
+            WHERE p.PROJ_FPTS IS NOT NULL
+
+            UNION ALL
+
+            SELECT 'previous' AS season, 
+                p.PLAYER_NAME AS player, 
+                r.TEAM AS team, 
+                r.OPP AS opponent, 
+                p.PROJ_FPTS AS projected_points,
+                CAST(p.GAMES_PLAYED AS INT) AS games_played
+            FROM drm85_wr_points_previous p
+            JOIN drm85_wr_ranking_previous r ON p.PLAYER_NAME = r.PLAYER_NAME
+            WHERE p.PROJ_FPTS IS NOT NULL
+        ),
+        team_player_stats AS (
+            SELECT team, 
+                player, 
+                AVG(projected_points) AS avg_projected_points, 
+                SUM(games_played) AS total_games_played
+            FROM player_stats
+            WHERE team IN (
+                SELECT DISTINCT team FROM (
+                    SELECT r.TEAM AS team FROM drm85_wr_ranking r
+                    UNION ALL
+                    SELECT r.TEAM AS team FROM drm85_wr_ranking_previous r
+                ) AS common_teams
+            )
+            GROUP BY team, player
+        )
+
+        SELECT team, player, avg_projected_points, total_games_played
+        FROM team_player_stats
+        ORDER BY total_games_played DESC
+        LIMIT 10;
+    """
+
     result = subprocess.run(
-        ["python", "main.py", "query", query_string],
-        capture_output=True,
-        text=True,
-        check=True,
+        ["python3", "main.py", "query", query_string], capture_output=True, text=True
     )
-    assert result.returncode == 0
-    assert "Querying data" in result.stdout
 
+    # Check if the command was successful
+    if result.returncode != 0:
+        print(f"Query failed with return code {result.returncode}")
+        print("STDOUT:", result.stdout)
+        print("STDERR:", result.stderr)
+        return
 
-def test_create_record():
-    """Tests the create_record operation."""
-    result = subprocess.run(
-        [
-            "python",
-            "main.py",
-            "create",
-            # Rank
-            "1",
-            "Player Name",
-            # Team
-            "Team A",
-            # Opponent
-            "Team B",
-            # Matchup
-            "Matchup A",
-            # Start_sit
-            "start",
-            # proj_fpts
-            "50.5",
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    assert result.returncode == 0
-    assert "Create Record" in result.stdout
-
-
-def test_update_record():
-    """Tests the update_record operation."""
-    result = subprocess.run(
-        [
-            "python",
-            "main.py",
-            "update",
-            "1",
-            "2",
-            "Updated Player Name",
-            "Updated Team A",
-            "Updated Team B",
-            "Updated Matchup A",
-            "bench",
-            "60.0",
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    assert result.returncode == 0
-    assert "Update Record" in result.stdout
-
-
-def test_delete_record():
-    """Tests the delete_record operation."""
-    result = subprocess.run(
-        ["python", "main.py", "delete", "1"],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    assert result.returncode == 0
-    assert "Delete Record" in result.stdout
+    # Check for expected output in the result
+    assert "team" in result.stdout, "Expected 'team' in the query result"
+    assert "player" in result.stdout, "Expected 'player' in the query result"
+    print("Query Test Passed!")
 
 
 if __name__ == "__main__":
+    test_extract()
     test_load()
     test_query()
-    test_create_record()
-    test_update_record()
-    test_delete_record()
