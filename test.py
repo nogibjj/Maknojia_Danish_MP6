@@ -53,7 +53,7 @@ def test_query():
     """
 
     try:
-        result = subprocess.run(
+        subprocess.run(
             ["python3", "main.py", "query", query_string],
             capture_output=True,
             text=True,
