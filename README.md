@@ -87,7 +87,7 @@ The results are sorted in descending order to display the top 10 players with th
  Row(team='CAR', player='Diontae Johnson', avg_projected_points=15.50)]
  ```
 
-![alt text](results.png)
+![alt text](Results.png)
 
 
 ## CI/CD
