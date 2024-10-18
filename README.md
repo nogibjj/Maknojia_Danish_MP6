@@ -1,6 +1,6 @@
 # Danish_Maknojia_MP6
 
-[![CI](https://github.com/nogibjj/Maknojia_Danish_MP6/actions/workflows/cicd.yml/badge.svg)](https://github.com/nogibjj/Maknojia_Danish_MP6/actions/workflows/cicd.yml)
+[![CI](https://github.com/nogibjj/Maknojia_Danish_MP6/actions/workflows/cicd.yml/badge.svg?branch=main)](https://github.com/nogibjj/Maknojia_Danish_MP6/actions/workflows/cicd.yml)
 
 ## Project Overview
 This project is a python script which interacts with a cloud-based SQL server on Databricks. The project requires us to build an ETL pipeline (Extract, Transform & Load) and focus on creating a complex SQL query:
@@ -71,6 +71,22 @@ LIMIT 10;
 This query calculates the average projected fantasy points for players in the 2024 season and combines it with data from previous seasons.
 It first extracts player statistics and their respective teams, then calculates the average projected points for each player grouped by their team.
 The results are sorted in descending order to display the top 10 players with the highest average projected points.
+
+## Output
+
+```text
+[Row(team='DAL', player='CeeDee Lamb', avg_projected_points=19.10),
+ Row(team='HOU', player='Nico Collins', avg_projected_points=17.70),
+ Row(team='CIN', player="Ja'Marr Chase", avg_projected_points=17.40),
+ Row(team='MIN', player='Justin Jefferson', avg_projected_points=17.20),
+ Row(team='SEA', player='DK Metcalf', avg_projected_points=16.80),
+ Row(team='GB', player='Jayden Reed', avg_projected_points=16.10),
+ Row(team='TB', player='Chris Godwin', avg_projected_points=16.00),
+ Row(team='ARI', player='Marvin Harrison Jr.', avg_projected_points=15.70),
+ Row(team='SF', player='Deebo Samuel Sr.', avg_projected_points=15.50),
+ Row(team='CAR', player='Diontae Johnson', avg_projected_points=15.50)]
+ ```
+
 
 
 ## CI/CD
